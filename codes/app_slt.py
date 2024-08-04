@@ -1,5 +1,16 @@
 import streamlit as st
 import requests
+import NoogleDriver
+from noogleai import NoogleAI
+
+NoogleDriver.driverReady.wait()
+noogleDriver = NoogleDriver.noogleDriver
+print(noogleDriver)
+
+def summarizer(ask):
+    client = NoogleAI(text_instruction=ask)
+    summarized = client.summarizeResults(driver=noogleDriver)
+    return summarized
 
 # Initialize session state for chat history
 if 'chat_history' not in st.session_state:
@@ -10,10 +21,7 @@ def handle_input():
     user_message = st.session_state.user_input
     if user_message:
         st.session_state.chat_history.append(('user', user_message))
-        bot_response = requests.post(
-            'http://localhost:8888/hear',
-            data={'ask': user_message}
-        ).json()
+        bot_response = summarizer(user_message)
         st.session_state.chat_history.append(('bot', bot_response))
         st.session_state.user_input = ""
 
